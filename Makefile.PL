@@ -3,6 +3,12 @@ use strict;
 
 name 'Net-PingFM';
 all_from 'lib/Net/PingFM.pm';
+perl_version => '5.008';
+
+requires Readonly => '1.03';
+requires Moose => '0.55';
+requires LWP => '5.814';
+requires 'XML::Twig' => '3.32';
 
 # prompt user to see if they want to run online tests?
 my $prompt = "Online tests will need api/user keys and an internet connection.\n Don't worry the tests (should not) post anything as we'll send posts with the debug flag!\nRun online tests?";

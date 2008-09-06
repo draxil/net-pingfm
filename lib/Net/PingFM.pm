@@ -15,7 +15,7 @@ Simple little module for posting to http://ping.fm/
 =head1 STATUS
 
 Currently the library can do basic posting to different services, and that's
-about it! 
+about it!
 
 =head1 CONSTRUCTOR
 
@@ -27,6 +27,7 @@ Additional constructor parameters:
 
 debug_mode => 1, # will stop posts from actually appearing
 dump_responses => 1 # will cause us to print our XML responses for debug
+
 
 =cut
 
@@ -79,8 +80,9 @@ has last_error => (
 
 no Moose;
 
-# constants #
 our $VERSION = '0.1';
+
+# constants #
 Readonly my $PINGFM_URL => 'http://api.ping.fm/v1/';
 Readonly my $UAGENT => 'PerlNetPingFM/' . $VERSION;
 
