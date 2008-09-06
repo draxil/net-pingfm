@@ -5,12 +5,17 @@ Net::PingFM - Interact with ping.fm from perl
 =head1 SYNOPSIS
 
 my $pfm = Net::PingFM->new( user_key => 'blah',
-                            application_key => 'foo' );
+                            api_key => 'foo' );
 
 
 =head1 DESCRIPTION
 
 Simple little module for posting to http://ping.fm/
+
+=head1 STATUS
+
+Currently the library can do basic posting to different services, and that's
+about it! 
 
 =head1 CONSTRUCTOR
 
@@ -76,7 +81,6 @@ no Moose;
 
 # constants #
 our $VERSION = '0.1';
-Readonly $VERSION;
 Readonly my $PINGFM_URL => 'http://api.ping.fm/v1/';
 Readonly my $UAGENT => 'PerlNetPingFM/' . $VERSION;
 
