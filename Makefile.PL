@@ -3,7 +3,6 @@ use strict;
 
 name 'Net-PingFM';
 all_from 'lib/Net/PingFM.pm';
-perl_version => '5.008';
 
 requires Readonly => '1.03';
 requires Moose => '0.55';

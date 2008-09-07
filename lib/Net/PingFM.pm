@@ -33,14 +33,17 @@ dump_responses => 1 # will cause us to print our XML responses for debug
 
 package Net::PingFM;
 
+use strict; # moose will do this anyway, but...
 use Moose;
 use Moose::Util::TypeConstraints;
+
+require 5.008;
 
 use Readonly;
 use LWP;
 use Hash::Util qw{ lock_hash };
 use XML::Twig;
-
+use Carp;
 
 # moose attribute defininitions
 has api_key => (
@@ -80,7 +83,7 @@ has last_error => (
 
 no Moose;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 # constants #
 Readonly my $PINGFM_URL => 'http://api.ping.fm/v1/';
