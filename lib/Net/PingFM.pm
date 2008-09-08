@@ -4,9 +4,23 @@ Net::PingFM - Interact with ping.fm from perl
 
 =head1 SYNOPSIS
 
-my $pfm = Net::PingFM->new( user_key => 'blah',
+ # Make pingfm object with our user and api keys:
+ my $pfm = Net::PingFM->new( user_key => 'blah',
                             api_key => 'foo' );
+ 
+ # check they like our keys (you don't need to do this!)
+ $pfm->user_validate or die 'Couldn\'t log in to ping.fm!';
 
+ # make a post using our default method:
+ $pfm->post( 'Hello ping.fm!' );
+ 
+ # make a microblog post:
+ $pfm->post( 'Testing Net::PingFM' , { method => 'microblog' } );
+ 
+ # make a real blog post, with title and everything!
+ $pfm->post( 'Testing Net::PingFM. Hours of fun..',
+             { method => 'blog', title => 'Testing Testing!'} );
+ 
 
 =head1 DESCRIPTION
 
@@ -19,9 +33,9 @@ about it!
 
 =head1 CONSTRUCTOR
 
- Your user and application keys are required). Module will die without them.
+Your user and application keys are required). Module will die without them.
 
-my $pfm = Net::PingFM->new( api_key => 'blah', user_key => 'blah' );
+ my $pfm = Net::PingFM->new( api_key => 'blah', user_key => 'blah' );
 
 Additional constructor parameters:
 
@@ -81,9 +95,8 @@ has last_error => (
     writer => '_last_error',
 );
 
-no Moose;
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 # constants #
 Readonly my $PINGFM_URL => 'http://api.ping.fm/v1/';
@@ -104,12 +117,12 @@ lock_hash( %REQUESTS );
 
 =head2 user_validate
 
-if ( $pfm->user_validate ){
-   # we have a valid user key
-}
-else{
-  # we don't!
-}
+ if ( $pfm->user_validate ){
+    # we have a valid user key
+ }
+ else{
+   # we don't!
+ }
 
 Validate the user's application key. Returns true value if the user key is OK
 and false otherwise.
@@ -123,7 +136,11 @@ sub user_validate{
 }
 
 
-=head2 post( $body , \%optional_params )
+=head2 post
+
+ $pfm->post( $body , \%optional_params );
+ $pfm->post( 'Hacking on Net::PingFM', { post_method => 'status' });
+ $pfm->post( 'Posting using my default method' );
 
 Post! We at least need a $body which is the body of the post we'll send to
 ping.fm.
@@ -131,8 +148,12 @@ ping.fm.
 Optional parameter hashref can contain:
 
 post_method => What you would like to post to.
+method => shorthand for post_method
 
-Valid post_method's are blog, microblog, status and default. Default will use your default post method on ping.fm. Default is our default!
+Valid post_method's are blog, microblog, status and default. Default will use
+your default post method on ping.fm. Default is our default! 'method' is a
+less cumbersome option to type, if for some reason you choose to use both
+parameters then 'post_method' is the one which will be used.
 
 title => The title for the post. Ping.fm requires this for post_method 'blog' but we don't enforce that in the module!
 
@@ -157,7 +178,7 @@ sub post {
     $ARGS{body} = $body;
 
     # what kind of post?:
-    $ARGS{post_method} = $opts->{post_method};
+    $ARGS{post_method} = $opts->{post_method} || $opts->{method};
     $ARGS{post_method} ||= 'default';
 
     # validate post_method
@@ -283,15 +304,22 @@ sub __valid_rsp{
     return $rsp->tag eq 'rsp' && $rsp->att('status');
 }
 
+no Moose;
+
 ;1;
 __END__
 
 =head1 ERROR HANDLING
 
 If something goes wrong at the network or XML parsing level the methods will
-die. If thing go wrong at the API level, as in ping.fm gives us an actual
+die. If things go wrong at the API level, as in ping.fm gives us an actual
 error then the method will generally return false and set last_error with an
 error message from ping.fm.
+
+=head1 MOOSE!
+
+This is implemented using moose, so can be messed with in a moosey way if you
+feel like it!
 
 =head1 API INFO
 

@@ -1,8 +1,11 @@
-Sat Sep  6 2008
+Sat 6th Sep 2008
 
 0.1 Fist release! Basic posting.
 
-Sun Sep 7 2008
+Sun 7th Sep 2008
 
 0.2 Some small fixes to hopefully stop failing cpan tests!
 
+Mon 8th Sep 2008
+
+0.3 Small fix to include 'method' as an alias to 'post_method'. A little more documentation and some tests for the synopsis. 
