@@ -39,9 +39,15 @@ Your user and application keys are required). Module will die without them.
 
 Additional constructor parameters:
 
-debug_mode => 1, # will stop posts from actually appearing
-dump_responses => 1 # will cause us to print our XML responses for debug
+=over
 
+=item * debug_mode => 1,
+ # will stop posts from actually appearing
+
+=item * dump_responses => 1
+# will cause us to print our XML responses for debug
+
+=back
 
 =cut
 
@@ -142,22 +148,28 @@ sub user_validate{
  $pfm->post( 'Hacking on Net::PingFM', { post_method => 'status' });
  $pfm->post( 'Posting using my default method' );
 
-Post! We at least need a $body which is the body of the post we'll send to
-ping.fm.
+Make a post! We at least need a $body which is the body of the post we'll send
+to ping.fm.
 
 Optional parameter hashref can contain:
 
-post_method => What you would like to post to.
-method => shorthand for post_method
+=over
+
+=item * post_method => What you would like to post to.
+
+=item * method => shorthand for post_method
 
 Valid post_method's are blog, microblog, status and default. Default will use
 your default post method on ping.fm. Default is our default! 'method' is a
 less cumbersome option to type, if for some reason you choose to use both
 parameters then 'post_method' is the one which will be used.
 
-title => The title for the post. Ping.fm requires this for post_method 'blog' but we don't enforce that in the module!
+=item * title => The title for the post. Ping.fm requires this for post_method
+'blog' but we don't enforce that in the module!
 
-service => Just post to one service
+=item * service => Just post to one service
+
+=back
 
 =cut
 Readonly my %VALID_POST_PARAMS => (
