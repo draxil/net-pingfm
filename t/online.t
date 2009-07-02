@@ -82,6 +82,6 @@ ok( $pfm->post( 'Testing Net::PingFM. Hours of fun..',
     'Synopsis: blog!' );
 
 my @s = $pfm->services;
-ok( scalar (@s) || ref @s[0] eq 'Net::PingFM::Service',
+ok( scalar (@s) || ref $s[0] eq 'Net::PingFM::Service',
      'Services returns a services object' );
 
