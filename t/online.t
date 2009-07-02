@@ -23,7 +23,7 @@ if ( ! $api_key || ! $user_key ) {
     plan( skip_all => 'Skipping network tests!' );
 }
 else {
-    plan( tests => 16 );
+    plan( tests => 17 );
 }
 
 
@@ -68,7 +68,7 @@ my $spfm = Net::PingFM->new( user_key => 'blah',
 ok( $spfm, 'synopsis made an object' );
 
 # check they like our keys (you don't need to do this!)
-ok( $pfm->user_validate or die 'Couldn\'t log in to ping.fm!', 'synopsis: logincheck');
+ok( ( $pfm->user_validate or die 'Couldn\'t log in to ping.fm!' ), 'synopsis: logincheck');
 
 # make a post using our default method:
 ok( $pfm->post( 'Hello ping.fm!' ), 'Synopsis: post' );
@@ -80,3 +80,8 @@ ok( $pfm->post( 'Testing Net::PingFM' , { method => 'microblog' } ), 'Synopsis: 
 ok( $pfm->post( 'Testing Net::PingFM. Hours of fun..',
              { method => 'blog', title => 'Testing Testing!'} ),
     'Synopsis: blog!' );
+
+my @s = $pfm->services;
+ok( scalar (@s) || ref @s[0] eq 'Net::PingFM::Service',
+     'Services returns a services object' );
+

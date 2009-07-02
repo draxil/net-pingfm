@@ -21,6 +21,10 @@ Net::PingFM - Interact with ping.fm from perl
  $pfm->post( 'Testing Net::PingFM. Hours of fun..',
              { method => 'blog', title => 'Testing Testing!'} );
  
+ # get the list of services for the account:
+ my @services = $pfm->services;
+
+
 
 =head1 DESCRIPTION
 
@@ -65,6 +69,9 @@ use Hash::Util qw{ lock_hash };
 use XML::Twig;
 use Carp;
 
+# our internals:
+use Net::PingFM::Service;
+
 # moose attribute defininitions
 has api_key => (
     is => 'ro',
@@ -102,7 +109,25 @@ has last_error => (
 );
 
 
-our $VERSION = '0.3';
+# supply a class to use in place of LWP ( for testing )
+has _use_lwp_replacement => (
+    is => 'rw',
+    default => 0,
+);
+
+# save our posts for test script inspection:
+has '_debug_save_last_post' => (
+    is => 'rw',
+    default => 0,
+);
+
+has '_debug_last_post' => (
+    is => 'rw',
+);
+
+
+
+our $VERSION = '0.4_001';
 
 # constants #
 Readonly my $PINGFM_URL => 'http://api.ping.fm/v1/';
@@ -111,9 +136,12 @@ Readonly my $UAGENT => 'PerlNetPingFM/' . $VERSION;
 # request definitions #
 Readonly my $USER_VALIDATE => 'user.validate';
 Readonly my $USER_POST => 'user.post';
+Readonly my $SERVICES => 'user.services';
+
 Readonly my %REQUESTS => (
     $USER_VALIDATE => 1,
     $USER_POST => 1,
+    $SERVICES => 1,
 );
 lock_hash( %REQUESTS );
 
@@ -172,10 +200,10 @@ parameters then 'post_method' is the one which will be used.
 =back
 
 =cut
-Readonly my %VALID_POST_PARAMS => (
+Readonly our %VALID_POST_PARAMS => (
     post_method => 1, title => 1, service => 1
 );
-Readonly my %VALID_POST_METHODS => (
+Readonly our %VALID_POST_METHODS => (
     default => 1, blog => 1, microblog => 1, status => 1,
 );
 
@@ -197,6 +225,13 @@ sub post {
     exists $VALID_POST_METHODS{ $ARGS{post_method} }
     	or confess 'Invalid post method: ' . $ARGS{post_method};
 
+
+    if ( $opts->{service}
+         && ( my $service = __parse_service_opt( $opts->{service} )))
+    {
+        $ARGS{ service } = $service;
+    }
+
     # copy in misc. options:
     for ( 'title', ) {
     	if ( exists $opts->{$_} ) {
@@ -207,6 +242,72 @@ sub post {
     # do the request!
     my $response = $self->_request( $USER_POST, \%ARGS );
     return __rsp_ok( $response );
+}
+
+# work out what we were given
+sub __parse_service_opt{
+    my $so = shift;
+
+    # maybe a service object?:
+    if ( ref  $so ) {
+        if ( $so->isa( 'Net::PingFM::Service' ) ) {
+            return $so->id;
+        }
+        confess 'Can\'t use a reference for your "service" unless that reference is a Net::PingFM::Service. What you provided seems to be a :'. ref $so;
+    }
+
+    # probably a service id:
+    return $so;
+}
+
+=head2 services
+
+ my @services = $pfm->services;
+
+Get a list of services for this account.
+
+Returns a list of Net::PingFM::Service objects
+
+=cut
+sub __service_xml_to_object;
+sub services{
+    my $self = shift;
+    my $rsp = $self->_request( $SERVICES );
+
+    # bail if we've failed:
+    if ( ! __rsp_ok( $rsp )) {
+        return;
+    }
+
+    # otherwise build our response
+    return map{ __service_xml_to_object }
+           $rsp->get_xpath( './services/service' );
+}
+
+sub __service_xml_to_object{
+    my @c_args;
+
+    # direct properties of the service object:
+    foreach my $prop ( 'id', 'name' ) {
+        if ( my $val = $_->att( $prop )) {
+            push @c_args, $prop => $val;
+        }
+    }
+
+    # deal with the strings:
+    foreach my $prop ( 'trigger', 'url', 'icon' ) {
+        if ( my $val = $_->first_child_text( $prop ) ) {
+            push @c_args, $prop => $val;
+        }
+    }
+
+    # now the list of methods:
+    if ( my $methods = $_->first_child_text( 'methods' ) ) {
+        push @c_args, 'methods' => [ split ',', $methods ];
+    }
+
+    # make object!
+    return Net::PingFM::Service->new( @c_args  );
 }
 
 =head2 last_error
@@ -237,7 +338,7 @@ sub _request{
         die join '', "Error parsing response for '$request': $@";
     }
 
-    # dump responses:
+    # dump response? 
     if ( $self->dump_responses ) {
         print $twig->sprint, "\n";
     }
@@ -249,9 +350,13 @@ sub _request{
         die 'Invalid XML response!';
     }
 
+    if ( $rsp->first_child_text( 'method' ) ne $request ) {
+        warn 'Response method doesn\'t match request method. Something has probably gone wrong!';
+    }
+
     # possibly stash an error message
     if ( ! __rsp_ok( $rsp ) ) {
-        if ( my $msg = $rsp->first_child_text('message') ) {
+        if ( my $msg = $rsp->first_child_text( 'message' ) ) {
             $self->_last_error( $msg );
         }
         else {
@@ -268,7 +373,12 @@ sub _web_request{
     my ( $request, $extra_params ) = @_
     	or confess 'Need $request and $extra_params';
 
-    my $lwp = $self->_lwp();
+    my $lwp;
+
+    # get our lwp user agent
+    unless ( $lwp = $self->_use_lwp_replacement ) {
+        $lwp = $self->_lwp();
+    }
 
     # form always takes user & api keys:
     my %form = (
@@ -278,7 +388,15 @@ sub _web_request{
         %$extra_params,
     );
 
+    # are we recording things for tests?
+    if ( $self->_debug_save_last_post ) {
+        $self->_debug_last_post( \%form );
+    }
+
+    # make a url for this request:
     my $url =  __request_url( $request );
+
+    # POST!
     my $response = $lwp->post( $url, \%form );
 
     # handle failure:

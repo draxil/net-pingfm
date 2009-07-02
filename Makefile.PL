@@ -10,7 +10,13 @@ requires LWP => '5.812';
 requires 'XML::Twig' => '3.26';
 
 # prompt user to see if they want to run online tests?
-my $prompt = "Online tests will need api/user keys and an internet connection.\n Don't worry the tests (should not) post anything as we'll send posts with the debug flag!\nRun online tests?";
+my $prompt = join "\n", (
+    'Online tests will need api/user keys and an internet connection.',
+    q|Don't worry the tests (should not) post anything as we'll send posts with the debug flag!|,
+    q|Your the user acount will have to have at least one service installed|,
+    q|Run online tests?|,
+    '',
+);
 my $run_online_tests = prompt $prompt, 'n';
 my ( $api_key, $user_key ) = @_;
 

@@ -1,11 +1,15 @@
-Sat 6th Sep 2008
+xxx xxx Sep 2008
 
-0.1 Fist release! Basic posting.
-
-Sun 7th Sep 2008
-
-0.2 Some small fixes to hopefully stop failing cpan tests!
+0.4 - Better offline tests. Supports status enquiries. Better docs. 
 
 Mon 8th Sep 2008
 
-0.3 Small fix to include 'method' as an alias to 'post_method'. A little more documentation and some tests for the synopsis. 
+0.3 - Small fix to include 'method' as an alias to 'post_method'. A little more documentation and some tests for the synopsis. Syntax error fix for fussier tests.
+
+Sun 7th Sep 2008
+
+0.2 - Some small fixes to hopefully stop failing cpan tests!
+
+Sat 6th Sep 2008
+
+0.1 - Fist release! Basic posting.
