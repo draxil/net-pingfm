@@ -82,6 +82,7 @@ ok( $pfm->post( 'Testing Net::PingFM. Hours of fun..',
     'Synopsis: blog!' );
 
 my @s = $pfm->services;
-ok( scalar (@s) || ref $s[0] eq 'Net::PingFM::Service',
-     'Services returns a services object' );
+# better testing of this in fake_online!
+ok( scalar (@s) == 0 || ref $s[0] eq 'Net::PingFM::Service',
+     'Services returns a services object or nowt depending on account' );
 
