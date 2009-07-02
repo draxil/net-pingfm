@@ -175,6 +175,7 @@ sub user_validate{
  $pfm->post( $body , \%optional_params );
  $pfm->post( 'Hacking on Net::PingFM', { post_method => 'status' });
  $pfm->post( 'Posting using my default method' );
+ $pfm->post( 'Hacking on Net::PingFM, don\'t tell facebook', { service => 'twitter' });
 
 Make a post! We at least need a $body which is the body of the post we'll send
 to ping.fm.
@@ -195,7 +196,8 @@ parameters then 'post_method' is the one which will be used.
 =item * title => The title for the post. Ping.fm requires this for post_method
 'blog' but we don't enforce that in the module!
 
-=item * service => Just post to one service
+=item * service => Just post to one service use the service id or a
+Net::PingFM::Service object.
 
 =back
 
