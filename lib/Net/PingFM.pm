@@ -455,6 +455,12 @@ feel like it!
 
 http://groups.google.com/group/pingfm-developers/web/api-documentation
 
+=head1 DEVELOPMENT
+
+Follow development of this library (and or fork it!) on github:
+
+http://github.com/draxil/net-pingfm/
+
 =head1 AUTHOR
 
 Joe Higton
