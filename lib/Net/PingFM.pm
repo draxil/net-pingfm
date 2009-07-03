@@ -41,6 +41,12 @@ Your user and application keys are required). Module will die without them.
 
  my $pfm = Net::PingFM->new( api_key => 'blah', user_key => 'blah' );
 
+The API key is your developer api key which you get from ping.fm and is
+associated with your app, and the user key is the key to authenticate you with
+a particular account. See the L<<a
+href='http://groups.google.com/group/pingfm-developers/web/api-documentation'>api
+docs</a>> for more details.
+
 Additional constructor parameters:
 
 =over
@@ -127,7 +133,7 @@ has '_debug_last_post' => (
 
 
 
-our $VERSION = '0.4_001';
+our $VERSION = '0.4_002';
 
 # constants #
 Readonly my $PINGFM_URL => 'http://api.ping.fm/v1/';
@@ -196,8 +202,8 @@ parameters then 'post_method' is the one which will be used.
 =item * title => The title for the post. Ping.fm requires this for post_method
 'blog' but we don't enforce that in the module!
 
-=item * service => Just post to one service use the service id or a
-Net::PingFM::Service object.
+=item * service => Just post to one service. Fot the value  use the service id
+or a Net::PingFM::Service object.
 
 =back
 
