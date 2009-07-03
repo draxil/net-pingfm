@@ -43,9 +43,7 @@ Your user and application keys are required). Module will die without them.
 
 The API key is your developer api key which you get from ping.fm and is
 associated with your app, and the user key is the key to authenticate you with
-a particular account. See the L<<a
-href='http://groups.google.com/group/pingfm-developers/web/api-documentation'>api
-docs</a>> for more details.
+a particular account. See the L<api docs|/API INFO> for more details.
 
 Additional constructor parameters:
 
@@ -133,7 +131,7 @@ has '_debug_last_post' => (
 
 
 
-our $VERSION = '0.4_002';
+our $VERSION = '0.4_003';
 
 # constants #
 Readonly my $PINGFM_URL => 'http://api.ping.fm/v1/';
@@ -203,7 +201,7 @@ parameters then 'post_method' is the one which will be used.
 'blog' but we don't enforce that in the module!
 
 =item * service => Just post to one service. Fot the value  use the service id
-or a Net::PingFM::Service object.
+or a L<Net::PingFM::Service> object.
 
 =back
 
@@ -274,7 +272,7 @@ sub __parse_service_opt{
 
 Get a list of services for this account.
 
-Returns a list of Net::PingFM::Service objects
+Returns a list of L<Net::PingFM::Service> objects
 
 =cut
 sub __service_xml_to_object;
