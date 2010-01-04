@@ -47,6 +47,7 @@ else {
 
 
 # ok, do the hard work!
+repository 'http://github.com/draxil/net-pingfm';
 WriteAll;
 
 #fin#
