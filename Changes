@@ -1,3 +1,7 @@
+xxxxx  2010
+
+0.5_001 - Bugfixes: Made pingfm less sensitive to changes of post method.
+
 3rd Jul 2009
 
 0.4 - Better offline tests. Supports service queries and service posting. Better docs.
