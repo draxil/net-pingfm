@@ -23,7 +23,7 @@ no Moose;
 package main;
 
 use strict;
-use Test::More tests => 23;
+use Test::More tests => 24;
 
 
 use Net::PingFM;
@@ -137,7 +137,24 @@ use Scalar::Util qw{ blessed };
     ok( $pfm->post( 'boo', { service => $twitter->id }), 'Can use a service id in post' );
 
     ok( $pfm->_debug_last_post->{service} eq 'twitter', '..And that set the relivant post field' );
-    
+
+    prep_test_response( $pfm, '<?xml version="1.0"?>
+<rsp status="OK">
+  <transaction>12345</transaction>
+  <method>user.services</method>
+  <services>
+    <service id="twitter" name="Twitter">
+      <trigger>@tt</trigger>
+      <url>http://twitter.com/</url>
+      <icon>http://p.ping.fm/static/icons/twitter.png</icon>
+      <methods>microblog,status,carrots</methods>
+    </service>
+  </services>
+</rsp>', 1);
+
+    my @services = $pfm->services;
+
+    is( scalar @{ $services[0]->methods }, 2, 'Services don\'t know how to post carrots');
 }
 
 
