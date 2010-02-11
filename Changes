@@ -1,6 +1,6 @@
-xxxxx  2010
+11 Feb  2010
 
-0.5_001 - Bugfixes: Made pingfm less sensitive to changes of post method.
+0.5_001 - Bugfixes: Made pingfm less sensitive to unrecognised post methods.
 
 3rd Jul 2009
 
