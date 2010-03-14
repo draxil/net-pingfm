@@ -132,7 +132,7 @@ has '_debug_last_post' => (
 
 
 
-our $VERSION = '0.5';
+our $VERSION = '0.6_001';
 
 # constants #
 Readonly my $PINGFM_URL => 'http://api.ping.fm/v1/';
@@ -246,12 +246,7 @@ sub post {
         $ARGS{ service } = $service;
     }
 
-    # copy in misc. options:
-    for ( 'title', ) {
-    	if ( exists $opts->{$_} ) {
-            $ARGS{$_}  = $opts->{$_};
-        }
-    }
+    __populate_common_post_args( $opts, \%ARGS );
 
     # do the request!
     my $response = $self->_request( $USER_POST, \%ARGS );
@@ -272,6 +267,73 @@ sub __parse_service_opt{
 
     # probably a service id:
     return $so;
+}
+
+sub __populate_common_post_args{
+    my( $opts, $post_args ) = @_;
+
+    # copy in misc. options:
+    for ( 'title', ) {
+    	if ( exists $opts->{$_} ) {
+            $post_args->{$_}  = $opts->{$_};
+        }
+    }
+
+    return;
+}
+
+=head2 trigger_post
+
+$pfm->trigger_post( $trigger, $body, $opts );
+$pfm->trigger_post( 'tw', 'Testing Ping.fm triggers!' );
+
+Post to a "ping.fm" trigger. The $trigger can be a trigger id (as in the
+textual id of the trigger) or a Net::PingFM::Trigger object
+
+=cut
+sub trigger_post{
+    my $self = shift;
+    my ( $trigger, $body, $opts ) = @_;
+
+    # vet the required arguments:
+    unless ( $trigger && $body ) {
+        confess 'trigger_post usage: $pfm->trigger_post( $trigger, $body )';
+    }
+
+    $opts ||= {};
+
+    # check the options hash:
+    unless ( ref $opts eq 'HASH' ) {
+        confess 'trigger_post options should be a hash reference';
+    }
+
+    # now start building our request args:
+    my %ARGS;
+
+    $ARGS{body} = $body;
+
+    # populate the trigger option:
+    $ARGS{trigger} = __parse_trigger_option( $trigger );
+
+    __populate_common_post_args( $opts, \%ARGS );
+
+    # do the request!
+    my $response = $self->_request( $USER_TPOST, \%ARGS );
+    return __rsp_ok( $response );
+}
+
+sub __parse_trigger_option{
+    my( $trig ) = @_;
+
+    if ( ref $trig ) {
+        # does this look like a trigger object?
+        if( $trig->isa( 'Net::PingFM::Trigger' ) ) {
+            return $trig->id;
+        }
+        confess 'You provided a reference for your trigger, but it doesn\'t look like a Net::PingFM::Trigger object';
+    }
+
+    return $trig;
 }
 
 =head2 services
