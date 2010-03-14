@@ -75,6 +75,7 @@ use Carp;
 
 # our internals:
 use Net::PingFM::Service;
+use Net::PingFM::Trigger;
 
 # moose attribute defininitions
 has api_key => (
@@ -141,11 +142,18 @@ Readonly my $UAGENT => 'PerlNetPingFM/' . $VERSION;
 Readonly my $USER_VALIDATE => 'user.validate';
 Readonly my $USER_POST => 'user.post';
 Readonly my $SERVICES => 'user.services';
+Readonly my $TRIGGERS => 'user.triggers';
+Readonly my $USER_TPOST => 'user.tpost';
 
+# Make a hash of valid requests
 Readonly my %REQUESTS => (
-    $USER_VALIDATE => 1,
-    $USER_POST => 1,
-    $SERVICES => 1,
+    map{ $_ => 1 } (
+        $USER_VALIDATE,
+        $USER_POST,
+        $SERVICES,
+        $TRIGGERS,
+        $USER_TPOST,
+    )
 );
 lock_hash( %REQUESTS );
 
@@ -318,6 +326,43 @@ sub __service_xml_to_object{
     # make object!
     return Net::PingFM::Service->new( @c_args  );
 }
+
+=head2 triggers
+
+Grab the list of "triggers" from ping.fm. These allow you to post to your
+ping.fm groups, allowing you to post to multiple services at once.
+
+Returns a list of L<Net::PingFM::Trigger> objects describing the triggers.
+
+=cut
+sub __trigger_xml_to_object;
+sub triggers{
+    my $self = shift;
+
+    my $rsp = $self->_request( $TRIGGERS );
+
+    # bail if we've failed:
+    if ( ! __rsp_ok( $rsp )) {
+        return;
+    }
+
+    return map{ __trigger_xml_to_object }
+           $rsp->get_xpath( './triggers/trigger' );
+}
+
+sub __trigger_xml_to_object{
+    my @c_args;
+
+    # attributes from the trigger that we're interested in:
+    foreach my $prop ( 'id', 'method' ) {
+        if ( my $val = $_->att( $prop )) {
+            push @c_args, $prop => $val;
+        }
+    }
+
+    return Net::PingFM::Trigger->new( @c_args );
+}
+
 
 =head2 last_error
 
