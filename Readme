@@ -1,0 +1,13 @@
+Net::PingFM
+
+A library for perl that lets you drive the http://ping.fm api.
+
+To install:
+
+perl Makefile.PL
+make
+make test
+make install
+
+For more details see the POD documentation (one you've installed you can access this via man Net::PingFM).
+
