@@ -132,7 +132,7 @@ has '_debug_last_post' => (
 
 
 
-our $VERSION = '0.6_001';
+our $VERSION = '0.6_002';
 
 # constants #
 Readonly my $PINGFM_URL => 'http://api.ping.fm/v1/';
